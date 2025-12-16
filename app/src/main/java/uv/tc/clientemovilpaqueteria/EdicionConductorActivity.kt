@@ -1,0 +1,171 @@
+package uv.tc.clientemovilpaqueteria
+
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.google.gson.Gson
+import com.koushikdutta.ion.Ion
+import uv.tc.clientemovilpaqueteria.databinding.ActivityEdicionConductorBinding
+import uv.tc.clientemovilpaqueteria.dto.Respuesta
+import uv.tc.clientemovilpaqueteria.poko.Colaborador
+import uv.tc.clientemovilpaqueteria.util.Constantes
+
+class EdicionConductorActivity : AppCompatActivity() {
+
+    private lateinit var  binding : ActivityEdicionConductorBinding
+    private lateinit var conductor : Colaborador
+    private val CURP_REGEX = "[A-Z]{4}[0-9]{6}[H|M][A-Z]{2}[B|C|D|F|G|H|J|K|L|M|N|Ñ|P|Q|R|S|T|V|W|X|Y|Z]{3}[0-9A-Z]{1}[0-9]{1}"
+    private val SOLO_LETRAS_REGEX = "^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\\s]+\$"
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding =ActivityEdicionConductorBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+        cargarDatosConductor()
+        binding.btnAceptar.setOnClickListener {
+            guardarCambios()
+        }
+    }
+
+    private fun guardarCambios() {
+        if(sonCamposValidos()){
+            conductor.nombre = binding.etNombre.text.toString()
+            conductor.apellidoPaterno = binding.etApPaterno.text.toString()
+            conductor.apellidoMaterno = binding.etApMaterno.text.toString()
+            conductor.curp = binding.etCurp.text.toString().uppercase()
+            conductor.correo = binding.etCorreo.text.toString()
+            conductor.noLicencia = binding.etLicencia.text.toString()
+
+            enviarCambiosAPI()
+        }
+
+    }
+
+    fun sonCamposValidos() : Boolean{
+        var valido = true
+        binding.etNombre.error = null
+        binding.etApPaterno.error = null
+        binding.etCurp.error = null
+        binding.etCorreo.error = null
+        binding.etLicencia.error = null
+
+        if (binding.etNombre.text.isEmpty()){
+            binding.etNombre.setError("Nombre obligatorio")
+            valido = false
+        }else if (!binding.etNombre.text.toString().matches(Regex(SOLO_LETRAS_REGEX))) {
+            binding.etNombre.setError("Solo se permiten letras en el nombre")
+            valido = false
+        }
+        if(binding.etApPaterno.text.isEmpty()){
+            binding.etApPaterno.setError("Apellido paterno obligatorio")
+            valido  = false
+        }else if (!binding.etApPaterno.text.toString().matches(Regex(SOLO_LETRAS_REGEX))) {
+            binding.etApPaterno.setError("Solo se permiten letras en el apellido paterno")
+            valido = false
+        }
+        if(binding.etApMaterno.text.isNotEmpty() && !binding.etApMaterno.text.toString().matches(Regex(SOLO_LETRAS_REGEX))){
+            binding.etApMaterno.setError("Solo se permiten letras en el apellido materno")
+            valido = false
+        }
+        val curpTexto = binding.etCurp.text.toString().uppercase()
+        if(binding.etCurp.text.isEmpty()){
+            binding.etCurp.setError("CURP obligatorio")
+            valido  = false
+        } else if (!curpTexto.matches(Regex(CURP_REGEX))) {
+            // Si NO está vacío, pero NO cumple el formato
+            binding.etCurp.setError("Formato de CURP inválido (18 caracteres)")
+            valido = false
+        }
+        if(binding.etCorreo.text.isEmpty()){
+            binding.etCorreo.setError("Correo electronico obligatorio")
+            valido  = false
+        }
+        if(binding.etLicencia.text.isEmpty()){
+            binding.etLicencia.setError("Numero de Licencia obligatorio")
+            valido  = false
+        }
+
+        return valido
+    }
+
+    private fun enviarCambiosAPI() {
+        val gson = Gson()
+        val jsonConductor = gson.toJson(conductor)
+
+        val urlActualizacion = "${Constantes().URL_API}colaborador/editar"
+        Toast.makeText(this, "Guardando cambios...", Toast.LENGTH_SHORT).show()
+        Ion.with(this)
+            .load("PUT", urlActualizacion)
+            .setHeader("Content-Type", "application/json")
+            .setStringBody(jsonConductor)
+            .asString()
+            .setCallback { e, result ->
+                if (e == null) {
+                    manejarRespuestaAPI(result)
+                } else {
+                    Toast.makeText(this,
+                        "Error de red al actualizar: No se pudo conectar con el servidor.",
+                        Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
+    private fun manejarRespuestaAPI(jsonRespuesta: String?) {
+        try {
+            val gson = Gson()
+            val respuestaServidor = gson.fromJson(jsonRespuesta, Respuesta::class.java)
+            if (!respuestaServidor.error) {
+                Toast.makeText(this, "¡Datos actualizados correctamente!",
+                    Toast.LENGTH_LONG).show()
+                val resultadoIntent = Intent()
+                val conductorActualizadoJson = gson.toJson(conductor)
+                resultadoIntent.putExtra("conductor_actualizado", conductorActualizadoJson)
+                setResult(RESULT_OK, resultadoIntent)
+                finish()
+            }else {
+                Toast.makeText(this,
+                    "Error al guardar: ${respuestaServidor.mensaje}",
+                    Toast.LENGTH_LONG).show()
+                setResult(RESULT_CANCELED)
+                finish()
+            }
+        }catch (e : Exception){
+            Toast.makeText(this, "Error al procesar la respuesta del servidor.",
+                Toast.LENGTH_LONG).show()
+        }
+
+    }
+
+    fun cargarDatosConductor(){
+        val jsonDatos = intent.getStringExtra("datos_colaborador_json")
+        if(jsonDatos != null){
+            try{
+                val gson = Gson()
+                conductor = gson.fromJson(jsonDatos, Colaborador::class.java)
+                binding.etNombre.setText(conductor.nombre)
+                binding.etApPaterno.setText(conductor.apellidoPaterno)
+                binding.etApMaterno.setText(conductor.apellidoMaterno)
+                binding.etCurp.setText(conductor.curp)
+                binding.etCorreo.setText(conductor.correo)
+                binding.etLicencia.setText(conductor.noLicencia)
+
+            }catch (e : Exception){
+                Toast.makeText(this,
+                    "Fallo al cargar la información para edición.",
+                    Toast.LENGTH_LONG).show()
+                e.printStackTrace()
+                finish()
+
+            }
+        }else{
+            Toast.makeText(this,
+                "Error: No se recibieron datos del conductor.",
+                Toast.LENGTH_LONG).show()
+        }
+    }
+}

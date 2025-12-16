@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="fondo">#FFF2F4F7</color>
+    <color name="header">#FF1E3A5F</color>
+    <color name="botones">#FFFF8C00</color>
+    <color name="texto">#FF1A1A1A</color>
+    <color name="estado">#FF22C55E</color>
+    <color name="gris">#8B948B</color>
+</resources>

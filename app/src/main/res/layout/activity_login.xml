@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/fondo"> <ImageView
+        android:layout_marginTop="80dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/packet_world"
+        android:layout_gravity="center_horizontal"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/RoundedCorners"
+        />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:textSize="17sp"
+            android:textColor="@color/texto"
+            android:text="Ingresa tu número de personal y tu contraseña"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:textColor="@color/texto"
+            android:text="Número de Personal"
+            />
+        <EditText
+            android:id="@+id/et_noPersonal"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLength="10"
+            android:hint="EMP001"
+            android:textColorHint="@color/header"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:textColor="@color/texto"
+            android:text="Contraseña"
+            />
+        <EditText
+            android:id="@+id/et_password"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:maxLength="20"
+            android:hint="************"
+            android:textColorHint="@color/header"
+            />
+        <Button
+            android:id="@+id/btn_ingresar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="40dp"
+            android:text="Iniciar Sesión"
+            android:textStyle="bold"
+            android:textColor="@color/fondo"
+            android:backgroundTint="@color/botones"
+            />
+
+    </LinearLayout>
+</ScrollView>
