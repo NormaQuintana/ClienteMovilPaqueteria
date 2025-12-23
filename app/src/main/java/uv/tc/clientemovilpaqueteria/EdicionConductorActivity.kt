@@ -34,12 +34,12 @@ class EdicionConductorActivity : AppCompatActivity() {
 
     private fun guardarCambios() {
         if(sonCamposValidos()){
-            conductor.nombre = binding.etNombre.text.toString()
-            conductor.apellidoPaterno = binding.etApPaterno.text.toString()
-            conductor.apellidoMaterno = binding.etApMaterno.text.toString()
-            conductor.curp = binding.etCurp.text.toString().uppercase()
-            conductor.correo = binding.etCorreo.text.toString()
-            conductor.noLicencia = binding.etLicencia.text.toString()
+            conductor.nombre = binding.etNombre.text.toString().trim()
+            conductor.apellidoPaterno = binding.etApPaterno.text.toString().trim()
+            conductor.apellidoMaterno = binding.etApMaterno.text.toString().trim()
+            conductor.curp = binding.etCurp.text.toString().uppercase().trim()
+            conductor.correo = binding.etCorreo.text.toString().trim()
+            conductor.noLicencia = binding.etLicencia.text.toString().trim()
 
             enviarCambiosAPI()
         }
@@ -94,8 +94,18 @@ class EdicionConductorActivity : AppCompatActivity() {
     }
 
     private fun enviarCambiosAPI() {
+        val datosFiltrados = mapOf(
+            "idColaborador" to conductor.idColaborador,
+            "nombre" to conductor.nombre,
+            "apellidoPaterno" to conductor.apellidoPaterno,
+            "apellidoMaterno" to conductor.apellidoMaterno,
+            "curp" to conductor.curp,
+            "correo" to conductor.correo,
+            "noLicencia" to conductor.noLicencia,
+            "idSucursal" to conductor.idSucursal
+        )
         val gson = Gson()
-        val jsonConductor = gson.toJson(conductor)
+        val jsonConductor = gson.toJson(datosFiltrados)
 
         val urlActualizacion = "${Constantes().URL_API}colaborador/editar"
         Toast.makeText(this, "Guardando cambios...", Toast.LENGTH_SHORT).show()
@@ -132,7 +142,7 @@ class EdicionConductorActivity : AppCompatActivity() {
                     "Error al guardar: ${respuestaServidor.mensaje}",
                     Toast.LENGTH_LONG).show()
                 setResult(RESULT_CANCELED)
-                finish()
+
             }
         }catch (e : Exception){
             Toast.makeText(this, "Error al procesar la respuesta del servidor.",
