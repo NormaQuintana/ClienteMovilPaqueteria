@@ -43,6 +43,14 @@
         android:layout_marginStart="30dp"
         android:src="@drawable/perfil_vacio"
         />
+    <ImageView
+        android:id="@+id/ivSeleccionarFoto"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="200dp"
+        android:layout_marginStart="65dp"
+        android:src="@drawable/ic_foto"
+        />
     <TextView
         android:id="@+id/tvHola"
         android:layout_below="@id/toolbar_principal"
@@ -80,9 +88,9 @@
         android:id="@+id/tvLicenciaConductor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvNombre"
-        android:layout_marginTop="30dp"
-        android:layout_marginStart="232dp"
+        android:layout_below="@id/tvLicencia"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="170dp"
         android:text="LICN123456"
         android:textColor="@color/texto"
         android:textSize="15dp"
