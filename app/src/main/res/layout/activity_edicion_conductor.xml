@@ -11,8 +11,18 @@
         android:id="@+id/toolbar_principal"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:background="@color/header"
-        />
+        android:background="@color/header" >
+
+        <ImageView
+            android:id="@+id/btnVolver"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/ic_volver"
+            />
+    </Toolbar>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,24 +33,17 @@
         android:textSize="30dp"
         android:textStyle="bold"
         />
-    <ImageView
-        android:id="@+id/btnVolver"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_below="@id/toolbar_principal"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="10dp"
-        android:src="@drawable/ic_volver"
-        />
+
     <TextView
         android:id="@+id/tvDatosPersonales"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/btnVolver"
+        android:layout_below="@id/toolbar_principal"
         android:textAlignment="center"
         android:text="Datos Personales"
         android:textSize="20dp"
         android:textStyle="bold"
+        android:layout_marginTop="10dp"
         />
     <TextView
         android:id="@+id/tvNombreColaborador"
