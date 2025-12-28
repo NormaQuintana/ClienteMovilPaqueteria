@@ -131,10 +131,11 @@ class MainActivity : AppCompatActivity() {
     private fun obtenerDatosEdicion() {
         Ion.with(this)
             .load("GET", "${Constantes().URL_API}colaborador/obtener-por-noPersonal/${conductor.noPersonal}")
-            .asString()
+            .asByteArray()
             .setCallback { e, result ->
                 if (e == null) {
-                    enviarDatosAEdicion(result)
+                    val respuestaJson = String(result, Charsets.UTF_8)
+                    enviarDatosAEdicion(respuestaJson)
                 }else {
                     Toast.makeText(this@MainActivity,
                         "Error de red al obtener datos: ${e.message}",

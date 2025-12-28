@@ -10,14 +10,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.koushikdutta.ion.Ion
 import uv.tc.clientemovilpaqueteria.databinding.ActivityDetalleEnvioBinding
 import uv.tc.clientemovilpaqueteria.poko.DetalleEnvio
+import uv.tc.clientemovilpaqueteria.poko.EstatusEnvio
 import uv.tc.clientemovilpaqueteria.poko.Paquete
 import uv.tc.clientemovilpaqueteria.util.Constantes
 
 class DetalleEnvioActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetalleEnvioBinding
+    private var listaEstatusCatalogo: List<EstatusEnvio> = listOf()
+    private var detalleCargado: DetalleEnvio?  = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetalleEnvioBinding.inflate(layoutInflater)
@@ -34,6 +38,117 @@ class DetalleEnvioActivity : AppCompatActivity() {
             finish()
         }
 
+        binding.btnCambiarEstatus.setOnClickListener {
+            if (listaEstatusCatalogo.isEmpty()) {
+                obtenerCatalogoEstatus()
+            } else {
+                mostrarOpcionesEstatus()
+            }
+        }
+
+    }
+
+    private fun obtenerCatalogoEstatus() {
+        val url = "${Constantes().URL_API}catalogo/estatusEnvio"
+
+        Ion.with(this)
+            .load("GET", url)
+            .asByteArray()
+            .setCallback { e, result ->
+                if (e == null && result != null) {
+                    val tipoLista = object : TypeToken<List<EstatusEnvio>>() {}.type
+                    val jsonString = String(result, Charsets.UTF_8)
+                    listaEstatusCatalogo = Gson().fromJson(jsonString, tipoLista)
+                    mostrarOpcionesEstatus()
+                } else {
+                    Toast.makeText(this, "No se pudo cargar el catálogo", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    private fun mostrarOpcionesEstatus() {
+        val estatusFiltrados = listaEstatusCatalogo.filter { it.idEstatusEnvio >= 3 }
+        val nombresEstatus = estatusFiltrados.map { it.estatusEnvio }.toTypedArray()
+
+        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+        builder.setTitle("Actualizar Estatus del Envío")
+        builder.setItems(nombresEstatus) { _, which ->
+            val estatusSeleccionado = estatusFiltrados[which]
+
+            if (estatusSeleccionado.idEstatusEnvio == 5 || estatusSeleccionado.idEstatusEnvio == 6) {
+                mostrarDialogoComentario(estatusSeleccionado)
+            } else {
+                actualizarEstatusEnServidor(estatusSeleccionado, "Cambio de estado operativo")
+            }
+        }
+        builder.show()
+    }
+
+    private fun mostrarDialogoComentario(estatus: EstatusEnvio) {
+        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+        builder.setTitle("Motivo de: ${estatus.estatusEnvio}")
+
+        // Crear un EditText programáticamente
+        val input = android.widget.EditText(this)
+        input.hint = "Escribe el motivo aquí..."
+        input.setPadding(50, 40, 50, 40)
+
+        val container = android.widget.FrameLayout(this)
+        container.addView(input)
+        val params = android.widget.FrameLayout.LayoutParams(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        params.setMargins(40, 0, 40, 0)
+        input.layoutParams = params
+        builder.setView(container)
+
+        builder.setPositiveButton("Confirmar") { _, _ ->
+            val comentario = input.text.toString()
+            if (comentario.isNotEmpty()) {
+                actualizarEstatusEnServidor(estatus, comentario)
+            } else {
+                Toast.makeText(this, "El motivo es obligatorio", Toast.LENGTH_SHORT).show()
+            }
+        }
+        builder.setNegativeButton("Cancelar", null)
+        builder.show()
+    }
+
+    private fun actualizarEstatusEnServidor(estatus: EstatusEnvio, comentario: String) {
+        val url = "${Constantes().URL_API}historialEnvio/registrar"
+
+        val sharedPreferences = getSharedPreferences("SESION_CONDUCTOR", MODE_PRIVATE)
+        val idConductor = sharedPreferences.getInt("idColaborador", 0)
+
+        Ion.with(this)
+            .load("POST", url)
+            .setBodyParameter("idEnvio", detalleCargado!!.idEnvio.toString())
+            .setBodyParameter("idColaborador", idConductor.toString())
+            .setBodyParameter("idEstatusEnvio", estatus.idEstatusEnvio.toString())
+            .setBodyParameter("comentario", comentario)
+            .asByteArray()
+            .setCallback { e, result ->
+                if (e == null && result != null) {
+                    val respuestaJson = String(result, Charsets.UTF_8)
+                    if (respuestaJson.contains("true")) {
+                        Toast.makeText(this, "Estatus actualizado correctamente", Toast.LENGTH_SHORT).show()
+
+                        binding.tvDetalleEstatus.text = estatus.estatusEnvio.uppercase()
+
+                        if(estatus.idEstatusEnvio == 4) {
+                            binding.tvDetalleEstatus.setTextColor(resources.getColor(android.R.color.holo_green_dark))
+                        }
+                        if(estatus.idEstatusEnvio == 6) {
+                            binding.tvDetalleEstatus.setTextColor(resources.getColor(android.R.color.holo_red_dark))
+                        }
+                    } else {
+                        Toast.makeText(this, "Error: $result", Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    Toast.makeText(this, "Error de red: ${e?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     private fun obtenerDetallesServicio(noGuia: String) {
@@ -41,12 +156,15 @@ class DetalleEnvioActivity : AppCompatActivity() {
 
         Ion.with(this)
             .load("GET", url)
-            .asString()
+            .asByteArray()
             .setCallback { e, result ->
                 if (e == null && result != null) {
                     try {
-                        val detalle = Gson().fromJson(result, DetalleEnvio::class.java)
-                        obtenerEstatusReciente(noGuia, detalle)
+                        val jsonString = String(result, Charsets.UTF_8)
+                        detalleCargado = Gson().fromJson(jsonString, DetalleEnvio::class.java)
+                        detalleCargado?.let {
+                            obtenerEstatusReciente(noGuia, it)
+                        }
                     } catch (ex: Exception) {
                         Toast.makeText(this, "Error al procesar datos", Toast.LENGTH_SHORT).show()
                     }
@@ -61,11 +179,12 @@ class DetalleEnvioActivity : AppCompatActivity() {
 
         Ion.with(this)
             .load("GET", urlHistorial)
-            .asString()
+            .asByteArray()
             .setCallback { e, result ->
                 if (e == null && result != null) {
                     try {
-                        val jsonArray = com.google.gson.JsonParser.parseString(result).asJsonArray
+                        val jsonString = String(result, Charsets.UTF_8)
+                        val jsonArray = com.google.gson.JsonParser.parseString(jsonString).asJsonArray
                         if (jsonArray.size() > 0) {
                             val objEstatus = jsonArray.get(0).asJsonObject.getAsJsonObject("estatusEnvio")
                             detalle.status = objEstatus.get("estatusEnvio").asString
@@ -91,6 +210,11 @@ class DetalleEnvioActivity : AppCompatActivity() {
         binding.tvSucursalOrigen.text = dEnvio.nombreSucursal ?: "Sucursal no asignada"
         binding.tvTelefonoCliente.text = "Tel: ${dEnvio.telefono ?: "N/A"}"
         binding.tvCorreoCliente.text = dEnvio.correo ?: "N/A"
+        if (dEnvio.status == "Entregado" || dEnvio.status == "Cancelado") {
+            binding.btnCambiarEstatus.visibility = View.GONE
+        } else {
+            binding.btnCambiarEstatus.visibility = View.VISIBLE
+        }
     }
 
     private fun obtenerPaquetes(idEnvio: Int) {
@@ -98,11 +222,12 @@ class DetalleEnvioActivity : AppCompatActivity() {
 
         Ion.with(this)
             .load("GET", urlPaquetes)
-            .asString()
+            .asByteArray()
             .setCallback { e, result ->
                 if (e == null && result != null) {
                     val tipoListaPaquete = object : com.google.gson.reflect.TypeToken<List<Paquete>>() {}.type
-                    val listaPaquetes: List<Paquete> = Gson().fromJson(result, tipoListaPaquete)
+                    val jsonString = String(result, Charsets.UTF_8)
+                    val listaPaquetes: List<Paquete> = Gson().fromJson(jsonString, tipoListaPaquete)
                     mostrarPaquetesEnVista(listaPaquetes)
                 }
             }

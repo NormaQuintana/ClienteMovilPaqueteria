@@ -53,7 +53,6 @@ class EdicionConductorActivity : AppCompatActivity() {
 
     }
 
-
     fun sonCamposValidos() : Boolean{
         var valido = true
         binding.etNombre.error = null
@@ -121,10 +120,11 @@ class EdicionConductorActivity : AppCompatActivity() {
             .load("PUT", urlActualizacion)
             .setHeader("Content-Type", "application/json")
             .setStringBody(jsonConductor)
-            .asString()
+            .asByteArray()
             .setCallback { e, result ->
                 if (e == null) {
-                    manejarRespuestaAPI(result)
+                    val respuestaJson = String(result, Charsets.UTF_8)
+                    manejarRespuestaAPI(respuestaJson)
                 } else {
                     Toast.makeText(this,
                         "Error de red al actualizar: No se pudo conectar con el servidor.",
