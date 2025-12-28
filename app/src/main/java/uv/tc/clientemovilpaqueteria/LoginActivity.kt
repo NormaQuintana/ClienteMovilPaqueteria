@@ -47,9 +47,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun consumirAPI(noPersonal : String, password : String){
-        //Configuracion inicial, solo la primera vez en el consumo
         Ion.getDefault(this@LoginActivity).conscryptMiddleware.enable(false)
-        //Consumo de WS
         Ion.with(this@LoginActivity)
             .load("POST", "${Constantes().URL_API}autenticacion/conductor/")
             .setHeader("Content-Type", "application/x-www-form-urlencoded")
@@ -74,6 +72,12 @@ class LoginActivity : AppCompatActivity() {
             val gson : Gson = Gson()
             val respuestaLogin = gson.fromJson(json, RSAutenticacion::class.java)
             if(!respuestaLogin.error){
+                val preferences = getSharedPreferences("SESION_CONDUCTOR", MODE_PRIVATE)
+                val editor = preferences.edit()
+                respuestaLogin.conductor?.idColaborador?.let { id ->
+                    editor.putInt("idColaborador", id)
+                    editor.apply()
+                }
                 Toast.makeText(this@LoginActivity,
                     "Bienvenido(a) ${respuestaLogin.conductor!!.nombre} a PacketWorld",
                     Toast.LENGTH_LONG).show()

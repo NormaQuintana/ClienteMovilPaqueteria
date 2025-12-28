@@ -34,7 +34,7 @@
         android:layout_marginStart="90dp"
         android:textStyle="bold"
         />
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/ivFotoPerfil"
         android:layout_width="120dp"
         android:layout_height="120dp"
@@ -42,7 +42,10 @@
         android:layout_marginTop="30dp"
         android:layout_marginStart="30dp"
         android:src="@drawable/perfil_vacio"
-        />
+        android:scaleType="centerCrop"
+        app:strokeWidth="2dp"
+        app:strokeColor="@color/texto"
+        app:shapeAppearanceOverlay="@style/Circular" />
     <ImageView
         android:id="@+id/ivSeleccionarFoto"
         android:layout_width="50dp"

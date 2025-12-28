@@ -28,28 +28,30 @@ class ListaEnvioActivity : AppCompatActivity() {
         idColaborador = intent.getIntExtra("idColaborador", 0)
         binding.rvEnvios.layoutManager = LinearLayoutManager(this)
 
+        binding.btnVolver.setOnClickListener {
+            finish()
+        }
+    }
+    override fun onResume() {
+        super.onResume()
         if (idColaborador > 0) {
             obtenerEnviosServicio()
         } else {
             Toast.makeText(this, "Error: No se identificó al conductor", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.btnVolver.setOnClickListener {
-            finish()
         }
     }
 
     private fun obtenerEnviosServicio() {
         val url = "${Constantes().URL_API}envio/obtener-todos/$idColaborador"
 
-        Log.d("API_LISTA", "Consultando envíos en: $url")
 
         Ion.with(this)
             .load("GET", url)
-            .asString()
+            .asByteArray()
             .setCallback { e, result ->
                 if (e == null && result != null) {
-                    serializarInformacion(result)
+                    val respuestaJson = String(result, Charsets.UTF_8)
+                    serializarInformacion(respuestaJson)
                 } else {
                     Log.e("API_ERROR", "Error: ${e?.message}")
                     Toast.makeText(this, "Error de red: No se pudo conectar al servidor", Toast.LENGTH_LONG).show()
