@@ -30,6 +30,13 @@ class EdicionConductorActivity : AppCompatActivity() {
         binding.btnAceptar.setOnClickListener {
             guardarCambios()
         }
+        binding.btnVolver.setOnClickListener {
+            mostrarDialogoConfirmacion()
+        }
+    }
+    override fun onBackPressed() {
+        super.onBackPressed()
+        mostrarDialogoConfirmacion()
     }
 
     private fun guardarCambios() {
@@ -45,6 +52,7 @@ class EdicionConductorActivity : AppCompatActivity() {
         }
 
     }
+
 
     fun sonCamposValidos() : Boolean{
         var valido = true
@@ -177,5 +185,22 @@ class EdicionConductorActivity : AppCompatActivity() {
                 "Error: No se recibieron datos del conductor.",
                 Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun mostrarDialogoConfirmacion() {
+        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+        builder.setTitle("Confirmación")
+        builder.setMessage("¿Estás seguro de que deseas salir de los detalles del envío?")
+
+        builder.setNegativeButton("Cancelar") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        builder.setPositiveButton("Salir") { _, _ ->
+            finish()
+        }
+
+        val dialog = builder.create()
+        dialog.show()
     }
 }

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    
+    <Toolbar
+        android:id="@+id/toolbarLista"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/header"
+        android:titleTextColor="@color/fondo"
+        >
+        <ImageView
+            android:id="@+id/btnVolver"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_volver"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Mis envios asignados"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            android:textColor="@color/fondo"
+            android:textAlignment="center"/>
+    </Toolbar>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvEnvios"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp" />
+
+</LinearLayout>

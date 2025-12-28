@@ -38,6 +38,15 @@ class MainActivity : AppCompatActivity() {
         binding.ivMenu.setOnClickListener {
             mostrarMenu()
         }
+        binding.btnListaEnvio.setOnClickListener {
+            if(conductor != null){
+                val intent = Intent(this, ListaEnvioActivity::class.java)
+                intent.putExtra("idColaborador", conductor.idColaborador)
+                startActivity(intent)
+            }else {
+                Toast.makeText(this, "Información del conductor no disponible", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onStart() {

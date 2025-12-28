@@ -13,6 +13,12 @@
         android:theme="@style/Theme.ClienteMovilPaqueteria"
         tools:targetApi="31">
         <activity
+            android:name=".DetalleEnvioActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ListaEnvioActivity"
+            android:exported="false" />
+        <activity
             android:name=".EdicionConductorActivity"
             android:exported="false" />
         <activity
