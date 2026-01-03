@@ -26,6 +26,17 @@
             android:textColor="@color/fondo"
             android:textAlignment="center"/>
     </Toolbar>
+    <EditText
+        android:id="@+id/etBuscar"
+        android:layout_width="260dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="20dp"
+        android:textSize="15dp"
+        android:layout_below="@id/toolbar_principal"
+        android:hint="Buscar envio por No. de Guia"
+
+        />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvEnvios"
         android:layout_width="match_parent"

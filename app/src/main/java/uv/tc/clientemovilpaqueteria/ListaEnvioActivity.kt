@@ -1,6 +1,8 @@
 package uv.tc.clientemovilpaqueteria
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -19,6 +21,7 @@ import uv.tc.clientemovilpaqueteria.util.Constantes
 class ListaEnvioActivity : AppCompatActivity() {
     private lateinit var binding: ActivityListaEnvioBinding
     private var idColaborador: Int = 0
+    private var listaOriginal: List<Envio> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +30,8 @@ class ListaEnvioActivity : AppCompatActivity() {
 
         idColaborador = intent.getIntExtra("idColaborador", 0)
         binding.rvEnvios.layoutManager = LinearLayoutManager(this)
+
+        configurarBuscador()
 
         binding.btnVolver.setOnClickListener {
             finish()
@@ -38,6 +43,29 @@ class ListaEnvioActivity : AppCompatActivity() {
             obtenerEnviosServicio()
         } else {
             Toast.makeText(this, "Error: No se identificó al conductor", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun configurarBuscador() {
+        binding.etBuscar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                filtrarEnvios(s.toString())
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
+    private fun filtrarEnvios(texto: String) {
+        if (texto.isEmpty()) {
+            binding.rvEnvios.adapter = EnvioAdaptador(listaOriginal)
+        } else {
+            val listaFiltrada = listaOriginal.filter { envio ->
+                envio.noGuia?.contains(texto, ignoreCase = true) == true
+            }
+            binding.rvEnvios.adapter = EnvioAdaptador(listaFiltrada)
         }
     }
 
@@ -63,10 +91,10 @@ class ListaEnvioActivity : AppCompatActivity() {
         val gson = Gson()
         try {
             val tipoListaEnvio = object : TypeToken<List<Envio>>() {}.type
-            val listaEnvios: List<Envio> = gson.fromJson(json, tipoListaEnvio)
+            listaOriginal = gson.fromJson(json, tipoListaEnvio)
 
-            if (listaEnvios.isNotEmpty()) {
-                val adaptador = EnvioAdaptador(listaEnvios)
+            if (listaOriginal.isNotEmpty()) {
+                val adaptador = EnvioAdaptador(listaOriginal)
                 binding.rvEnvios.adapter = adaptador
             } else {
                 Toast.makeText(this, "No tienes envíos asignados actualmente", Toast.LENGTH_SHORT).show()
