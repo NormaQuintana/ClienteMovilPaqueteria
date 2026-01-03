@@ -50,7 +50,6 @@
             android:layout_height="wrap_content"
             android:maxLength="10"
             android:hint="EMP001"
-            android:textColorHint="@color/header"
             />
         <TextView
             android:layout_width="match_parent"
@@ -71,7 +70,6 @@
             android:inputType="textPassword"
             android:maxLength="20"
             android:hint="************"
-            android:textColorHint="@color/header"
             />
         <Button
             android:id="@+id/btn_ingresar"

@@ -53,11 +53,11 @@ class LoginActivity : AppCompatActivity() {
             .setHeader("Content-Type", "application/x-www-form-urlencoded")
             .setBodyParameter("noPersonal", noPersonal)
             .setBodyParameter("password", password)
-            .asString()
+            .asByteArray()
             .setCallback { e, result ->
                 if(e == null){
-                    //salida 200 OK
-                    serializarRepsuesta(result)
+                    val respuestaJson = String(result, Charsets.UTF_8)
+                    serializarRepsuesta(respuestaJson)
                 }else{
                     //ERROR
                     Toast.makeText(this@LoginActivity,
