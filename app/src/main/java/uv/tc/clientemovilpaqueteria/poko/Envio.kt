@@ -7,5 +7,5 @@ data class Envio(
     val ciudad: String,
     val estado: String,
     val codigoPostal: Int,
-    val status: String
+    val estatus: String
 )

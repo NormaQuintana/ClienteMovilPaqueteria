@@ -28,7 +28,7 @@ class EnvioAdaptador(private val listaEnvios: List<Envio>) :
 
         holder.binding.tvGuia.text = "Guía: #${envio.noGuia}"
         holder.binding.tvDireccion.text = direccionCompleta
-        holder.binding.tvEstatus.text = "Estatus: ${envio.status}"
+        holder.binding.tvEstatus.text = "Estatus: ${envio.estatus}"
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, DetalleEnvioActivity::class.java)
             intent.putExtra("noGuia", envio.noGuia)

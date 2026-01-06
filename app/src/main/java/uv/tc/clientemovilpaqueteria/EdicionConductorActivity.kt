@@ -190,7 +190,7 @@ class EdicionConductorActivity : AppCompatActivity() {
     private fun mostrarDialogoConfirmacion() {
         val builder = androidx.appcompat.app.AlertDialog.Builder(this)
         builder.setTitle("Confirmación")
-        builder.setMessage("¿Estás seguro de que deseas salir de los detalles del envío?")
+        builder.setMessage("¿Estás seguro de salir de la pantalla de edición?")
 
         builder.setNegativeButton("Cancelar") { dialog, _ ->
             dialog.dismiss()
