@@ -13,6 +13,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.koushikdutta.ion.Ion
 import uv.tc.clientemovilpaqueteria.databinding.ActivityDetalleEnvioBinding
+import uv.tc.clientemovilpaqueteria.dto.Respuesta
 import uv.tc.clientemovilpaqueteria.poko.DetalleEnvio
 import uv.tc.clientemovilpaqueteria.poko.EstatusEnvio
 import uv.tc.clientemovilpaqueteria.poko.Paquete
@@ -115,24 +116,33 @@ class DetalleEnvioActivity : AppCompatActivity() {
     }
 
     private fun actualizarEstatusEnServidor(estatus: EstatusEnvio, comentario: String) {
-        val url = "${Constantes().URL_API}historialEnvio/registrar"
+        val url = "${Constantes().URL_API}envio/actualizar-estatus"
 
         val sharedPreferences = getSharedPreferences("SESION_CONDUCTOR", MODE_PRIVATE)
         val idConductor = sharedPreferences.getInt("idColaborador", 0)
 
+        val datosCuerpo = HashMap<String, Any>()
+        datosCuerpo["idEnvio"] = detalleCargado?.idEnvio ?: 0
+        datosCuerpo["idEstatusEnvio"] = estatus.idEstatusEnvio
+        datosCuerpo["idColaborador"] = idConductor
+        datosCuerpo["comentario"] = comentario
+
+        val jsonCuerpo = Gson().toJson(datosCuerpo)
+
         Ion.with(this)
-            .load("POST", url)
-            .setBodyParameter("idEnvio", detalleCargado!!.idEnvio.toString())
-            .setBodyParameter("idColaborador", idConductor.toString())
-            .setBodyParameter("idEstatusEnvio", estatus.idEstatusEnvio.toString())
-            .setBodyParameter("comentario", comentario)
+            .load("PUT", url)
+            .setHeader("Content-Type", "application/json")
+            .setStringBody(jsonCuerpo)
             .asByteArray()
             .setCallback { e, result ->
                 if (e == null && result != null) {
                     val respuestaJson = String(result, Charsets.UTF_8)
-                    if (respuestaJson.contains("true")) {
+                    val respuestaObj = Gson().fromJson(respuestaJson, Respuesta::class.java)
+                    if (respuestaObj!= null && !respuestaObj.error) {
                         Toast.makeText(this, "Estatus actualizado correctamente", Toast.LENGTH_SHORT).show()
 
+                        detalleCargado?.estatus = estatus.estatusEnvio
+                        llenarVista(detalleCargado!!)
                         binding.tvDetalleEstatus.text = estatus.estatusEnvio.uppercase()
 
                         if(estatus.idEstatusEnvio == 9) {
@@ -142,6 +152,7 @@ class DetalleEnvioActivity : AppCompatActivity() {
                             binding.tvDetalleEstatus.setTextColor(resources.getColor(android.R.color.holo_red_dark))
                         }
                     } else {
+                        val msg = respuestaObj?.mensaje ?: "Respuesta inesperada"
                         Toast.makeText(this, "Error: $result", Toast.LENGTH_LONG).show()
                     }
                 } else {
