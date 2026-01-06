@@ -67,7 +67,7 @@ class DetalleEnvioActivity : AppCompatActivity() {
     }
 
     private fun mostrarOpcionesEstatus() {
-        val estatusFiltrados = listaEstatusCatalogo.filter { it.idEstatusEnvio >= 3 }
+        val estatusFiltrados = listaEstatusCatalogo.filter { it.idEstatusEnvio >= 7 }
         val nombresEstatus = estatusFiltrados.map { it.estatusEnvio }.toTypedArray()
 
         val builder = androidx.appcompat.app.AlertDialog.Builder(this)
@@ -75,7 +75,7 @@ class DetalleEnvioActivity : AppCompatActivity() {
         builder.setItems(nombresEstatus) { _, which ->
             val estatusSeleccionado = estatusFiltrados[which]
 
-            if (estatusSeleccionado.idEstatusEnvio == 5 || estatusSeleccionado.idEstatusEnvio == 6) {
+            if (estatusSeleccionado.idEstatusEnvio == 8 || estatusSeleccionado.idEstatusEnvio == 10) {
                 mostrarDialogoComentario(estatusSeleccionado)
             } else {
                 actualizarEstatusEnServidor(estatusSeleccionado, "Cambio de estado operativo")
@@ -88,7 +88,6 @@ class DetalleEnvioActivity : AppCompatActivity() {
         val builder = androidx.appcompat.app.AlertDialog.Builder(this)
         builder.setTitle("Motivo de: ${estatus.estatusEnvio}")
 
-        // Crear un EditText programáticamente
         val input = android.widget.EditText(this)
         input.hint = "Escribe el motivo aquí..."
         input.setPadding(50, 40, 50, 40)
@@ -136,10 +135,10 @@ class DetalleEnvioActivity : AppCompatActivity() {
 
                         binding.tvDetalleEstatus.text = estatus.estatusEnvio.uppercase()
 
-                        if(estatus.idEstatusEnvio == 4) {
+                        if(estatus.idEstatusEnvio == 9) {
                             binding.tvDetalleEstatus.setTextColor(resources.getColor(android.R.color.holo_green_dark))
                         }
-                        if(estatus.idEstatusEnvio == 6) {
+                        if(estatus.idEstatusEnvio == 10) {
                             binding.tvDetalleEstatus.setTextColor(resources.getColor(android.R.color.holo_red_dark))
                         }
                     } else {
@@ -187,10 +186,10 @@ class DetalleEnvioActivity : AppCompatActivity() {
                         val jsonArray = com.google.gson.JsonParser.parseString(jsonString).asJsonArray
                         if (jsonArray.size() > 0) {
                             val objEstatus = jsonArray.get(0).asJsonObject.getAsJsonObject("estatusEnvio")
-                            detalle.status = objEstatus.get("estatusEnvio").asString
+                            detalle.estatus = objEstatus.get("estatusEnvio").asString
                         }
                     } catch (ex: Exception) {
-                        detalle.status = "Pendiente"
+                        detalle.estatus = "Pendiente"
                     }
                 }
                 obtenerPaquetes(detalle.idEnvio)
@@ -200,7 +199,7 @@ class DetalleEnvioActivity : AppCompatActivity() {
 
     private fun llenarVista(dEnvio: DetalleEnvio) {
         binding.tvDetalleGuia.text = "Guía: #${dEnvio.noGuia}"
-        binding.tvDetalleEstatus.text = dEnvio.status ?: "No disponible"
+        binding.tvDetalleEstatus.text = dEnvio.estatus ?: "No disponible"
 
         binding.tvNombreReceptor.text = "${dEnvio.nombreReceptor} ${dEnvio.apellidoPaternoReceptor} ${dEnvio.apellidoMaternoReceptor}"
 
@@ -210,7 +209,7 @@ class DetalleEnvioActivity : AppCompatActivity() {
         binding.tvSucursalOrigen.text = dEnvio.nombreSucursal ?: "Sucursal no asignada"
         binding.tvTelefonoCliente.text = "Tel: ${dEnvio.telefono ?: "N/A"}"
         binding.tvCorreoCliente.text = dEnvio.correo ?: "N/A"
-        if (dEnvio.status == "Entregado" || dEnvio.status == "Cancelado") {
+        if (dEnvio.estatus == "Entregado" || dEnvio.estatus == "Cancelado") {
             binding.btnCambiarEstatus.visibility = View.GONE
         } else {
             binding.btnCambiarEstatus.visibility = View.VISIBLE

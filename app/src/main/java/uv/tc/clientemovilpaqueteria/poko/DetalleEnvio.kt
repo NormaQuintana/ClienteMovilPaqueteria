@@ -11,7 +11,7 @@ data class DetalleEnvio(
     val ciudad: String,
     val estado: String,
     val codigoPostal: Int,
-    var status: String? = "Sin Estatus",
+    var estatus: String? = "Sin Estatus",
     val nombreSucursal: String?,
     val telefono: String?,
     val correo: String?
