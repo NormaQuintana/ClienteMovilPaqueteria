@@ -3,7 +3,6 @@ package uv.tc.clientemovilpaqueteria
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -81,7 +80,6 @@ class ListaEnvioActivity : AppCompatActivity() {
                     val respuestaJson = String(result, Charsets.UTF_8)
                     serializarInformacion(respuestaJson)
                 } else {
-                    Log.e("API_ERROR", "Error: ${e?.message}")
                     Toast.makeText(this, "Error de red: No se pudo conectar al servidor", Toast.LENGTH_LONG).show()
                 }
             }
@@ -100,7 +98,6 @@ class ListaEnvioActivity : AppCompatActivity() {
                 Toast.makeText(this, "No tienes envíos asignados actualmente", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
-            Log.e("SERIALIZACION", "Error al convertir JSON: ${e.message}")
             Toast.makeText(this, "Error al procesar la lista de envíos", Toast.LENGTH_SHORT).show()
         }
     }

@@ -2,7 +2,6 @@ package uv.tc.clientemovilpaqueteria
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
@@ -67,7 +66,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun serializarRepsuesta(json : String){
-        Log.e("WS", json)
         try {
             val gson : Gson = Gson()
             val respuestaLogin = gson.fromJson(json, RSAutenticacion::class.java)
