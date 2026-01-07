@@ -20,6 +20,8 @@ class EdicionConductorActivity : AppCompatActivity() {
     private lateinit var conductor : Colaborador
     private val CURP_REGEX = "[A-Z]{4}[0-9]{6}[H|M][A-Z]{2}[B|C|D|F|G|H|J|K|L|M|N|Ñ|P|Q|R|S|T|V|W|X|Y|Z]{3}[0-9A-Z]{1}[0-9]{1}"
     private val SOLO_LETRAS_REGEX = "^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\\s]+\$"
+    private val LICENCIA_REGEX = "^[A-Z0-9]{8,10}$"
+    private val EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[a-z]{2,}$"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,21 +82,28 @@ class EdicionConductorActivity : AppCompatActivity() {
             valido = false
         }
         val curpTexto = binding.etCurp.text.toString().uppercase()
-        if(binding.etCurp.text.isEmpty()){
+        if(curpTexto.isEmpty()){
             binding.etCurp.setError("CURP obligatorio")
             valido  = false
         } else if (!curpTexto.matches(Regex(CURP_REGEX))) {
-            // Si NO está vacío, pero NO cumple el formato
             binding.etCurp.setError("Formato de CURP inválido (18 caracteres)")
             valido = false
         }
-        if(binding.etCorreo.text.isEmpty()){
+        val correoTexto = binding.etCorreo.text.toString()
+        if(correoTexto.isEmpty()){
             binding.etCorreo.setError("Correo electronico obligatorio")
             valido  = false
+        }else if (!correoTexto.matches(Regex(EMAIL_REGEX))) {
+            binding.etCorreo.error = "Formato de correo electrónico no válido"
+            valido = false
         }
-        if(binding.etLicencia.text.isEmpty()){
+        val licenciaTexto = binding.etLicencia.text.toString().uppercase().trim()
+        if(licenciaTexto.isEmpty()){
             binding.etLicencia.setError("Numero de Licencia obligatorio")
             valido  = false
+        } else if (!licenciaTexto.matches(Regex(LICENCIA_REGEX))) {
+            binding.etLicencia.error = "Formato de licencia inválido (8-12 caracteres alfanuméricos)"
+            valido = false
         }
 
         return valido
