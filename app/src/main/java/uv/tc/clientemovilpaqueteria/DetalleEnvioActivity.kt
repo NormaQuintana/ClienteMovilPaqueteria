@@ -50,7 +50,7 @@ class DetalleEnvioActivity : AppCompatActivity() {
     }
 
     private fun obtenerCatalogoEstatus() {
-        val url = "${Constantes().URL_API}catalogo/estatusEnvio"
+        val url = "${Constantes().URL_API}catalogo/obtener-estatusEnvio"
 
         Ion.with(this)
             .load("GET", url)
@@ -173,7 +173,8 @@ class DetalleEnvioActivity : AppCompatActivity() {
                         val jsonString = String(result, Charsets.UTF_8)
                         detalleCargado = Gson().fromJson(jsonString, DetalleEnvio::class.java)
                         detalleCargado?.let {
-                            obtenerEstatusReciente(noGuia, it)
+                            obtenerPaquetes(it.idEnvio)
+                            llenarVista(it)
                         }
                     } catch (ex: Exception) {
                         Toast.makeText(this, "Error al procesar datos", Toast.LENGTH_SHORT).show()
@@ -181,30 +182,6 @@ class DetalleEnvioActivity : AppCompatActivity() {
                 } else {
                     Toast.makeText(this, "Error al cargar detalles", Toast.LENGTH_SHORT).show()
                 }
-            }
-    }
-
-    private fun obtenerEstatusReciente(noGuia: String, detalle: DetalleEnvio) {
-        val urlHistorial = "${Constantes().URL_API}historialEnvio/consultar/$noGuia"
-
-        Ion.with(this)
-            .load("GET", urlHistorial)
-            .asByteArray()
-            .setCallback { e, result ->
-                if (e == null && result != null) {
-                    try {
-                        val jsonString = String(result, Charsets.UTF_8)
-                        val jsonArray = com.google.gson.JsonParser.parseString(jsonString).asJsonArray
-                        if (jsonArray.size() > 0) {
-                            val objEstatus = jsonArray.get(0).asJsonObject.getAsJsonObject("estatusEnvio")
-                            detalle.estatus = objEstatus.get("estatusEnvio").asString
-                        }
-                    } catch (ex: Exception) {
-                        detalle.estatus = "Pendiente"
-                    }
-                }
-                obtenerPaquetes(detalle.idEnvio)
-                llenarVista(detalle)
             }
     }
 
