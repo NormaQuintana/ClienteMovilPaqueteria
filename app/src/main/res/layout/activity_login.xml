@@ -48,7 +48,7 @@
             android:layout_marginEnd="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLength="10"
+            android:maxLength="20"
             android:hint="EMP001"
             />
         <TextView
